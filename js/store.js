@@ -1,0 +1,197 @@
+/* ============================================================
+   Be Grace CEO Hub — データ層 (store.js)
+   - すべてのデータはブラウザ内(localStorage)に保存されます
+   - JSONファイルへのバックアップ / 復元に対応（外部設定不要・永久に動作）
+   - Googleスプレッドシート同期はオプション（任意でオン）
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var KEY = "begrace_ceo_hub_v1";
+
+  // 初期データ構造
+  function blank() {
+    return {
+      settings: {
+        repName: "", bizName: "", bizType: "個人事業主",
+        mainBiz: "", mainProduct: "", price: "",
+        monthlyGoal: "", yearlyGoal: "",
+        idealWork: "", idealTeam: "", monthTheme: "",
+        todayWord: "未来は今日の積み重ね",
+        stage: "", goal: "", stageChecks: {}
+      },
+      sales: [],       // 売上
+      expenses: [],    // 経費
+      customers: [],   // 顧客
+      projects: [],    // プロジェクト/タスク
+      contents: [],    // 発信
+      bodyLogs: [],    // カラダ&エネルギー（日次）
+      team: [],        // チーム
+      manuals: [],     // マニュアル
+      future: {        // 未来設定
+        monthly: { salesGoal: "", profitGoal: "", idealState: "", todo: "", stop: "", theme: "" },
+        yearly: { salesGoal: "", profitGoal: "", peopleGoal: "", dream: "", growBiz: "", lifestyle: "", idealTeam: "", hireCount: "", socialValue: "" }
+      },
+      wheel: [],       // ライフバランスホイール（履歴）
+      weekly: [],      // 週次ミーティング
+      todos: {},       // 今日やること { "YYYY-MM-DD": [{text, done}] }
+      diagnosis: [],   // 「今日の戦略」のログ
+      sync: { enabled: false, url: "", lastSync: "" }
+    };
+  }
+
+  var data = load();
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return blank();
+      var parsed = JSON.parse(raw);
+      return mergeDefaults(parsed, blank());
+    } catch (e) {
+      console.warn("データ読み込み失敗、初期化します", e);
+      return blank();
+    }
+  }
+
+  // 旧データに新フィールドが無くても壊れないよう補完
+  function mergeDefaults(obj, def) {
+    if (Array.isArray(def)) return Array.isArray(obj) ? obj : def;
+    if (typeof def === "object" && def !== null) {
+      var out = {};
+      var keys = Object.keys(def).concat(Object.keys(obj || {}));
+      keys.forEach(function (k) {
+        if (out.hasOwnProperty(k)) return;
+        if (obj && obj.hasOwnProperty(k)) {
+          out[k] = (typeof def[k] === "object" && def[k] !== null && !Array.isArray(def[k]))
+            ? mergeDefaults(obj[k], def[k]) : obj[k];
+        } else {
+          out[k] = def[k];
+        }
+      });
+      return out;
+    }
+    return obj === undefined ? def : obj;
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) {
+      alert("保存に失敗しました。ブラウザの空き容量をご確認ください。");
+    }
+    if (data.sync && data.sync.enabled && data.sync.url) {
+      pushToSheet(); // 失敗してもローカルは守られる
+    }
+  }
+
+  function uid() {
+    return "id_" + Date.now().toString(36) + "_" + Math.floor(Math.random() * 1e6).toString(36);
+  }
+
+  /* ---------- 公開API ---------- */
+  var store = {
+    all: function () { return data; },
+
+    settings: function () { return data.settings; },
+    saveSettings: function (s) { data.settings = Object.assign(data.settings, s); persist(); },
+
+    future: function () { return data.future; },
+    saveFuture: function (f) { data.future = f; persist(); },
+
+    list: function (col) { return data[col] || []; },
+
+    add: function (col, item) {
+      item.id = uid();
+      data[col] = data[col] || [];
+      data[col].unshift(item);
+      persist();
+      return item;
+    },
+
+    update: function (col, id, patch) {
+      var arr = data[col] || [];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].id === id) { Object.assign(arr[i], patch); break; }
+      }
+      persist();
+    },
+
+    remove: function (col, id) {
+      data[col] = (data[col] || []).filter(function (x) { return x.id !== id; });
+      persist();
+    },
+
+    clearCol: function (col) {
+      data[col] = [];
+      persist();
+    },
+
+    find: function (col, id) {
+      return (data[col] || []).filter(function (x) { return x.id === id; })[0];
+    },
+
+    // 今日やること
+    todosFor: function (date) { return data.todos[date] || []; },
+    saveTodos: function (date, arr) { data.todos[date] = arr; persist(); },
+
+    // 診断ログ
+    addDiagnosis: function (entry) { data.diagnosis.unshift(entry); persist(); },
+
+    /* ---------- バックアップ / 復元（外部設定不要） ---------- */
+    exportJSON: function () {
+      return JSON.stringify(data, null, 2);
+    },
+    importJSON: function (text) {
+      var parsed = JSON.parse(text); // 失敗時は例外
+      data = mergeDefaults(parsed, blank());
+      persist();
+    },
+    download: function () {
+      var blob = new Blob([store.exportJSON()], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      var d = new Date();
+      var stamp = d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2);
+      a.href = url;
+      a.download = "BeGrace_CEOHub_backup_" + stamp + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    resetAll: function () {
+      data = blank();
+      persist();
+    },
+
+    /* ---------- Googleスプレッドシート同期（オプション） ---------- */
+    sync: function () { return data.sync; },
+    enableSync: function (url) {
+      data.sync.enabled = true;
+      data.sync.url = url.trim();
+      persist();
+    },
+    disableSync: function () {
+      data.sync.enabled = false;
+      persist();
+    }
+  };
+
+  function pushToSheet() {
+    try {
+      fetch(data.sync.url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "save", payload: data })
+      }).then(function () {
+        data.sync.lastSync = new Date().toISOString();
+      }).catch(function () { /* オフラインでもローカルは安全 */ });
+    } catch (e) { /* noop */ }
+  }
+  store.pushToSheet = pushToSheet;
+
+  window.BG = window.BG || {};
+  window.BG.store = store;
+})();
