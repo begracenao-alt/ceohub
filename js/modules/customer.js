@@ -1,4 +1,4 @@
-/* ===== ② CUSTOMER｜顧客・取引先管理 ===== */
+/* ===== ② Customer｜顧客・取引先管理 ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;

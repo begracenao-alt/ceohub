@@ -99,7 +99,16 @@
         return;
       }
       html += '<div class="' + cls + '"><label for="f_' + f.name + '">' + esc(f.label) + '</label>';
-      if (f.type === "select") {
+      if (f.type === "checks") {
+        var arr = Array.isArray(v) ? v : (v ? [v] : []);
+        html += '<div class="checks-group">';
+        (f.options || []).forEach(function (o, idx) {
+          html += '<label class="check-row" style="display:inline-flex;gap:6px;margin:0 14px 8px 0">' +
+            '<input type="checkbox" data-checks="' + f.name + '" value="' + esc(o) + '" id="f_' + f.name + '_' + idx + '"' + (arr.indexOf(o) >= 0 ? " checked" : "") + '>' +
+            '<span>' + esc(o) + '</span></label>';
+        });
+        html += '</div>';
+      } else if (f.type === "select") {
         html += '<select name="' + f.name + '" id="f_' + f.name + '">';
         (f.options || []).forEach(function (o) {
           html += '<option value="' + esc(o) + '"' + (String(v) === String(o) ? " selected" : "") + '>' + esc(o) + '</option>';
@@ -111,6 +120,9 @@
         html += '<datalist id="' + lid + '">';
         (f.options || []).forEach(function (o) { html += '<option value="' + esc(o) + '"></option>'; });
         html += '</datalist>';
+      } else if (f.type === "money") {
+        var mv = (v !== "" && v != null) ? Number(String(v).replace(/[^\d]/g, "") || 0).toLocaleString("ja-JP") : "";
+        html += '<input type="text" inputmode="numeric" name="' + f.name + '" id="f_' + f.name + '" data-money="1" value="' + mv + '" placeholder="' + esc(f.placeholder || "例：1,000,000") + '">';
       } else if (f.type === "textarea") {
         html += '<textarea name="' + f.name + '" id="f_' + f.name + '" placeholder="' + esc(f.placeholder || "") + '">' + esc(v) + '</textarea>';
       } else {
@@ -126,10 +138,16 @@
   function readForm(formEl, fields) {
     var out = {};
     fields.forEach(function (f) {
+      if (f.type === "checks") {
+        var arr = [];
+        formEl.querySelectorAll('[data-checks="' + f.name + '"]').forEach(function (n) { if (n.checked) arr.push(n.value); });
+        out[f.name] = arr;
+        return;
+      }
       var el = formEl.querySelector('[name="' + f.name + '"]');
       if (!el) return;
       if (f.type === "checkbox") out[f.name] = el.checked;
-      else if (f.type === "number") out[f.name] = num(el.value);
+      else if (f.type === "number" || f.type === "money") out[f.name] = num(el.value);
       else out[f.name] = el.value.trim();
     });
     return out;
@@ -142,6 +160,12 @@
       '<div class="modal-foot"><button class="btn" data-cancel>キャンセル</button>' +
       '<button class="btn btn-primary" data-save>保存</button></div>';
     openModal(opts.title, body, function (m) {
+      m.querySelectorAll("[data-money]").forEach(function (inp) {
+        inp.addEventListener("input", function () {
+          var digits = inp.value.replace(/[^\d]/g, "");
+          inp.value = digits ? Number(digits).toLocaleString("ja-JP") : "";
+        });
+      });
       m.querySelector("[data-cancel]").onclick = closeModal;
       m.querySelector("[data-save]").onclick = function () {
         var vals = readForm(m.querySelector("#bgForm"), opts.fields);

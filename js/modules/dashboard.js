@@ -35,11 +35,14 @@
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">' +
       '<div><div class="muted" style="font-size:13px">' + dateStr + '</div>' +
       '<div style="font-family:var(--serif);font-size:22px;color:var(--gold-deep);margin-top:4px">' +
-      (s.repName ? U.esc(s.repName) + ' さん、おはようございます' : 'おはようございます') + '</div>' +
+      (s.repName ? U.esc(s.repName) + ' さん、' + greetWord() : greetWord()) + '</div>' +
       (s.monthTheme ? '<div style="margin-top:6px">今月のテーマ：<strong>' + U.esc(s.monthTheme) + '</strong></div>' : '') +
       '</div>' +
       '<div class="quote" style="max-width:280px">' + U.esc(s.todayWord || greet) + '</div>' +
       '</div></div>';
+
+    // 📅 近日の予定（発信・締切を忘れない）
+    html += upcomingHTML();
 
     // 整い度（めぐり指数）＝看板
     html += meguriCardHTML();
@@ -88,6 +91,14 @@
     }
     html += '</div></div>';
 
+    // わたしの理想（基本情報から）
+    if (s.idealWork || s.idealTeam) {
+      html += '<div class="card mt"><div class="card-title">わたしの理想</div>' +
+        (s.idealWork ? '<div style="margin-bottom:6px"><span class="muted">理想の働き方：</span>' + U.esc(s.idealWork) + '</div>' : '') +
+        (s.idealTeam ? '<div><span class="muted">理想のチーム像：</span>' + U.esc(s.idealTeam) + '</div>' : '') +
+        '</div>';
+    }
+
     // チーム/未来メモ
     var fy = S.future().yearly;
     if (fy.dream || fy.idealTeam) {
@@ -114,6 +125,25 @@
     if (gs) gs.onclick = function () { BG.go("settings"); };
     var gst = document.getElementById("goStage");
     if (gst) gst.onclick = function () { BG.go("stage"); };
+
+    view.querySelectorAll('[data-go]').forEach(function (b) {
+      b.onclick = function () { BG.go(b.getAttribute("data-go")); };
+    });
+    var schedFields = [{ name: "date", label: "日付", type: "date" }, { name: "title", label: "内容（予約・アポ・イベント）", type: "text" }];
+    var refresh = function () { render(view); };
+    var asb = document.getElementById("addSched");
+    if (asb) asb.onclick = function () {
+      U.recordModal({ title: "予定を追加", fields: schedFields, values: { date: U.todayStr() }, onSave: function (v) { S.add("schedule", { date: v.date, title: v.title }); U.toast("追加しました"); refresh(); } });
+    };
+    view.querySelectorAll('[data-sched-edit]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute("data-sched-edit");
+        U.recordModal({ title: "予定を編集", fields: schedFields, values: S.find("schedule", id), onSave: function (v) { S.update("schedule", id, v); U.toast("更新しました"); refresh(); } });
+      };
+    });
+    view.querySelectorAll('[data-sched-del]').forEach(function (b) {
+      b.onclick = function () { var id = b.getAttribute("data-sched-del"); U.confirmDelete("この予定を削除しますか？", function () { S.remove("schedule", id); U.toast("削除しました"); refresh(); }); };
+    });
 
     document.getElementById("addTodo").onclick = function () {
       var arr = S.todosFor(U.todayStr());
@@ -192,6 +222,57 @@
       '<p style="font-size:13px;line-height:1.9;color:var(--ink-soft);max-width:460px;margin:14px auto 0">' + msg + '</p>' +
       '<div style="font-family:var(--serif);font-size:13.5px;color:var(--gold-deep);margin-top:12px">整っている時ほど、めぐる。</div>' +
       '</div>';
+  }
+
+  // 📅 近日の予定：予約・アポ＋発信の投稿予定日＋タスクの締切を集約（7日以内）
+  function dayDiff(a, b) { return Math.round((Date.parse(b) - Date.parse(a)) / 86400000); }
+  function relBadge(d, today) {
+    if (d < today) return '<span class="badge hot">' + dayDiff(d, today) + '日過ぎ</span>';
+    if (d === today) return '<span class="badge hot">今日</span>';
+    if (dayDiff(today, d) === 1) return '<span class="badge warn">明日</span>';
+    return '<span class="badge gray">' + dayDiff(today, d) + '日後</span>';
+  }
+  function upcomingHTML() {
+    var today = U.todayStr();
+    var h = new Date(); h.setDate(h.getDate() + 7);
+    var hStr = h.getFullYear() + "-" + ("0" + (h.getMonth() + 1)).slice(-2) + "-" + ("0" + h.getDate()).slice(-2);
+    var items = [];
+    S.list("schedule").forEach(function (s) {
+      if (s.date && s.date >= today && s.date <= hStr) items.push({ date: s.date, icon: "🗓", label: s.title || "(予定)", schedId: s.id });
+    });
+    S.list("contents").forEach(function (c) {
+      if (c.posted || !c.scheduledDate) return;
+      if (c.scheduledDate <= hStr) { var md = (c.media && c.media.length) ? c.media.join("・") : c.category; items.push({ date: c.scheduledDate, icon: "📣", label: (c.title || "(無題)") + (md ? "・" + md : ""), go: "sns" }); }
+    });
+    S.list("projects").forEach(function (t) {
+      if (t.status === "完了" || !t.due) return;
+      if (t.due <= hStr) items.push({ date: t.due, icon: "✅", label: (t.task || t.project || "(無題)"), go: "project" });
+    });
+    items.sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
+    var inner;
+    if (items.length) {
+      inner = items.map(function (it) {
+        var clickAttr = it.schedId ? ('data-sched-edit="' + it.schedId + '"') : ('data-go="' + it.go + '"');
+        var del = it.schedId ? '<button class="btn btn-sm btn-danger" data-sched-del="' + it.schedId + '" style="margin-left:6px">×</button>' : '';
+        return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-2)">' +
+          '<span ' + clickAttr + ' style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer">' +
+          '<span>' + it.icon + '</span><span style="flex:1;font-size:14px">' + U.esc(it.label) + '</span>' +
+          '<span class="muted" style="font-size:12px">' + U.fmtDate(it.date) + '</span>' + relBadge(it.date, today) + '</span>' + del + '</div>';
+      }).join("");
+    } else {
+      inner = '<div class="hint">7日以内の予定はありません。<br>「＋ 予定」で予約・アポを、SNSで投稿予定、PROJECTで締切を入れると、ここに出ます。</div>';
+    }
+    return '<div class="card mt" style="border-left:3px solid var(--rose)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="card-title" style="margin:0">📅 近日の予定（7日以内）</div>' +
+      '<button class="btn btn-sm" id="addSched">＋ 予定</button></div>' + inner + '</div>';
+  }
+
+  function greetWord() {
+    var hr = new Date().getHours();
+    if (hr < 5) return "こんばんは";
+    if (hr < 11) return "おはようございます";
+    if (hr < 18) return "こんにちは";
+    return "こんばんは";
   }
 
   function formatToday() {

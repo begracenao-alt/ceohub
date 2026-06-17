@@ -25,7 +25,13 @@
       customers: [],   // 顧客
       projects: [],    // プロジェクト/タスク
       contents: [],    // 発信
+      contentCats: ["Instagramリール", "ストーリーズ", "スレッズ", "LINE", "YouTube", "ブログ", "メルマガ"], // 発信カテゴリー（追加・削除できる）
+      dailyPosts: {},  // （旧）毎日の発信チェック
+      snsStats: [],    // SNSフォロワー記録 [{date, counts:{アカウント:数}}]
+      snsAccounts: ["Instagram", "スレッズ", "LINE公式", "YouTube", "メルマガ"], // フォロワー記録の対象アカウント（追加・削除できる）
+      schedule: [],    // 予定・予約・アポ [{date, title}]
       bodyLogs: [],    // カラダ&エネルギー（日次）
+      bodyMoves: ["枕運動", "ヨガ", "散歩"], // BODYの運動項目（追加・削除できる）
       team: [],        // チーム
       manuals: [],     // マニュアル
       future: {        // 未来設定
@@ -98,6 +104,19 @@
 
     future: function () { return data.future; },
     saveFuture: function (f) { data.future = f; persist(); },
+
+    setContentCats: function (arr) { data.contentCats = arr; persist(); },
+    setBodyMoves: function (arr) { data.bodyMoves = arr; persist(); },
+    setSnsAccounts: function (arr) { data.snsAccounts = arr; persist(); },
+
+    getDailyPosts: function () { return data.dailyPosts || {}; },
+    toggleDailyPost: function (date, medium) {
+      data.dailyPosts = data.dailyPosts || {};
+      var arr = data.dailyPosts[date] = data.dailyPosts[date] || [];
+      var i = arr.indexOf(medium);
+      if (i >= 0) arr.splice(i, 1); else arr.push(medium);
+      persist();
+    },
 
     list: function (col) { return data[col] || []; },
 

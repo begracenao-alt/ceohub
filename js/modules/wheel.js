@@ -1,4 +1,4 @@
-/* ===== ⑩ LIFE BALANCE WHEEL ===== */
+/* ===== ⑩ Life Balance｜ライフバランス ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;

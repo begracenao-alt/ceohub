@@ -86,7 +86,7 @@
   }
 
   BG.modules = BG.modules || {};
-  BG.modules.diagnosis = { title: "DAILY STRATEGY｜今日の戦略", render: render };
+  BG.modules.diagnosis = { title: "Strategy｜今日の戦略", render: render };
   BG.calc = BG.calc || {};
   BG.calc.todayTheme = todayTheme;
 })();

@@ -1,4 +1,4 @@
-/* ===== ⑧ FUTURE｜未来設定 ===== */
+/* ===== ⑧ Future｜未来設定 ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;
@@ -60,16 +60,16 @@
     view.innerHTML = html;
 
     var monthFields = [
-      { name: "salesGoal", label: "売上目標", type: "number" },
-      { name: "profitGoal", label: "利益目標", type: "number" },
+      { name: "salesGoal", label: "売上目標", type: "money" },
+      { name: "profitGoal", label: "利益目標", type: "money" },
       { name: "theme", label: "今月のテーマ", type: "text", full: true },
       { name: "idealState", label: "理想の状態", type: "textarea", full: true },
       { name: "todo", label: "やりたいこと", type: "textarea", full: true },
       { name: "stop", label: "やめること", type: "textarea", full: true }
     ];
     var yearFields = [
-      { name: "salesGoal", label: "年商目標", type: "number" },
-      { name: "profitGoal", label: "利益目標", type: "number" },
+      { name: "salesGoal", label: "年商目標", type: "money" },
+      { name: "profitGoal", label: "利益目標", type: "money" },
       { name: "peopleGoal", label: "人数目標", type: "text" },
       { name: "dream", label: "叶えたい未来", type: "textarea", full: true },
       { name: "growBiz", label: "育てたい事業", type: "textarea", full: true },

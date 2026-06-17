@@ -1,4 +1,4 @@
-/* ===== ① MONEY｜お金管理（確定申告まで対応） ===== */
+/* ===== ① Money｜お金管理（確定申告まで対応） ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;
@@ -42,7 +42,7 @@
     { name: "date", label: "日付", type: "date", value: U.todayStr() },
     { name: "customer", label: "顧客名／取引先名", type: "text" },
     { name: "product", label: "商品／サービス名", type: "text" },
-    { name: "amount", label: "売上金額", type: "number" },
+    { name: "amount", label: "売上金額", type: "money" },
     { name: "dueDate", label: "入金予定日", type: "date" },
     { name: "payMethod", label: "支払い方法", type: "select", options: ["銀行振込", "クレジット", "現金", "PayPay", "その他"] },
     { name: "paid", label: "入金済み", type: "checkbox" },
@@ -51,7 +51,7 @@
   var expFields = [
     { name: "date", label: "日付", type: "date", value: U.todayStr() },
     { name: "content", label: "内容（何に使ったか）", type: "text" },
-    { name: "amount", label: "金額", type: "number" },
+    { name: "amount", label: "金額", type: "money" },
     { name: "category", label: "勘定科目（選ぶ／自由に入力もOK）", type: "datalist", options: KANJO, placeholder: "一覧から選ぶか、入力もできます（例：外注工賃）" },
     { name: "memo", label: "メモ", type: "textarea", full: true }
   ];

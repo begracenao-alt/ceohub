@@ -1,4 +1,4 @@
-/* ===== STAGE｜成長の道のり（ステージ） ===== */
+/* ===== Stage｜成長の道のり（ステージ） ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;

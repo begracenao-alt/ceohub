@@ -1,4 +1,4 @@
-/* ===== ⑪ WEEKLY CEO MEETING｜週1振り返り ===== */
+/* ===== ⑪ Weekly｜週1振り返り ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;

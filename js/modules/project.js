@@ -1,4 +1,4 @@
-/* ===== ③ PROJECT｜事業プロジェクト管理 ===== */
+/* ===== ③ Project｜事業プロジェクト管理 ===== */
 (function () {
   "use strict";
   var S = BG.store, U = BG.ui;
