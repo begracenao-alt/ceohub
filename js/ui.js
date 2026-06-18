@@ -48,9 +48,30 @@
   var toastTimer;
   function toast(msg) {
     var t = document.getElementById("toast");
+    clearTimeout(toastTimer);
+    var S = window.BG && window.BG.store;
+    // 「削除しました」のときは『元に戻す』ボタンを出す（押し間違い対策）
+    if (/削除/.test(msg) && S && S.hasUndo && S.hasUndo()) {
+      t.innerHTML = esc(msg) +
+        '<button id="undoBtn" style="margin-left:14px;border:none;background:rgba(255,255,255,.22);' +
+        'color:#fff;font-size:13px;padding:5px 14px;border-radius:999px;cursor:pointer;font-family:inherit">' +
+        '元に戻す</button>';
+      t.hidden = false;
+      var btn = document.getElementById("undoBtn");
+      btn.onclick = function () {
+        clearTimeout(toastTimer);
+        t.hidden = true;
+        S.restoreLast();
+        var act = document.querySelector(".nav-item.active");
+        if (window.BG.go) window.BG.go(act ? act.getAttribute("data-key") : "dashboard");
+        toast("元に戻しました");
+      };
+      // 押す時間を長めに（6秒）
+      toastTimer = setTimeout(function () { t.hidden = true; }, 6000);
+      return;
+    }
     t.textContent = msg;
     t.hidden = false;
-    clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.hidden = true; }, 2200);
   }
 

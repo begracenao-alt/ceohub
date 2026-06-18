@@ -47,6 +47,7 @@
   }
 
   var data = load();
+  var lastDeleted = null; // 直前に削除したもの（元に戻す用）
 
   function load() {
     try {
@@ -137,14 +138,35 @@
     },
 
     remove: function (col, id) {
-      data[col] = (data[col] || []).filter(function (x) { return x.id !== id; });
+      var arr = data[col] || [];
+      var idx = -1, item = null;
+      for (var i = 0; i < arr.length; i++) { if (arr[i].id === id) { idx = i; item = arr[i]; break; } }
+      data[col] = arr.filter(function (x) { return x.id !== id; });
+      if (item) lastDeleted = { col: col, item: item, index: idx, ts: Date.now() };
       persist();
     },
 
     clearCol: function (col) {
+      lastDeleted = { col: col, prevArr: (data[col] || []).slice(), ts: Date.now() };
       data[col] = [];
       persist();
     },
+
+    // 直前の削除を元に戻す
+    restoreLast: function () {
+      if (!lastDeleted) return false;
+      var ld = lastDeleted; lastDeleted = null;
+      if (ld.prevArr) {
+        data[ld.col] = ld.prevArr;
+      } else {
+        var arr = data[ld.col] || (data[ld.col] = []);
+        var idx = ld.index; if (idx < 0 || idx > arr.length) idx = 0;
+        arr.splice(idx, 0, ld.item);
+      }
+      persist();
+      return true;
+    },
+    hasUndo: function () { return !!lastDeleted && (Date.now() - lastDeleted.ts < 12000); },
 
     find: function (col, id) {
       return (data[col] || []).filter(function (x) { return x.id === id; })[0];
