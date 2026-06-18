@@ -126,7 +126,13 @@
       '<button class="btn btn-primary" id="csvOut">' + selYear + '年ぶんを書き出す（CSV／Excelで開けます）</button>' +
       '</div>';
 
-    // 取り込み（コピー＆貼り付け）
+    // 売上テーブル（画面内スクロール＝エンドレス防止）
+    html += '<div class="card mt">' + U.sectionHead("売上", "売上を追加", "addSale") + '<div style="max-height:46vh;overflow:auto">' + tableSales() + '</div>' + clearBtn("sales", "clrSale", "売上") + '</div>';
+    // 経費テーブル（画面内スクロール＝エンドレス防止）
+    html += '<div class="card">' + U.sectionHead("経費", "経費を追加", "addExp") + '<div style="max-height:46vh;overflow:auto">' + tableExp() + '</div>' + clearBtn("expenses", "clrExp", "経費") + '</div>';
+    // 勘定科目の早見表（下に）
+    html += hayamiHTML();
+    // データを取り込む（コピー＆貼り付け）※いちばん下に
     html += '<div class="card mt"><div class="card-title">前のデータを取り込む（スプレッドシート／エクセル）</div>' +
       '<p class="hint" style="margin-bottom:10px">今までつけていた分を、コピー＆貼り付けで取り込めます。<br>① スプレッドシートで取り込みたい範囲を選んで<strong>コピー</strong> → ② 下の枠をクリックして<strong>貼り付け（⌘V）</strong> → ③ 下の<strong>売上／経費ボタン</strong>を押す。<br>列の順番がちがっても、中身を見て自動で読み取ります。完璧に移さなくても、今日から入れていけば十分です。</p>' +
       '<textarea id="pasteBox" placeholder="ここに、スプレッドシートからコピーした表を貼り付け（⌘V）" style="width:100%;min-height:100px;font-family:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface-2);color:var(--ink)"></textarea>' +
@@ -134,13 +140,6 @@
       '<button class="btn btn-primary" id="pasteSale">売上として取り込む</button>' +
       '<button class="btn btn-primary" id="pasteExp">経費として取り込む</button>' +
       '</div></div>';
-
-    // 売上テーブル
-    html += '<div class="card mt">' + U.sectionHead("売上", "売上を追加", "addSale") + tableSales() + clearBtn("sales", "clrSale", "売上") + '</div>';
-    // 勘定科目の早見表（迷わないために）
-    html += hayamiHTML();
-    // 経費テーブル
-    html += '<div class="card">' + U.sectionHead("経費", "経費を追加", "addExp") + tableExp() + clearBtn("expenses", "clrExp", "経費") + '</div>';
 
     view.innerHTML = html;
 
