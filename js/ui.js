@@ -121,9 +121,8 @@
         (f.options || []).forEach(function (o) { html += '<option value="' + esc(o) + '"></option>'; });
         html += '</datalist>';
       } else if (f.type === "money") {
-        var mv = (v !== "" && v != null) ? Number(String(v).replace(/[^\d]/g, "") || 0) : "";
-        html += '<input type="number" inputmode="numeric" step="1" min="0" class="money-input" data-prev="prev_' + f.name + '" name="' + f.name + '" id="f_' + f.name + '" value="' + mv + '" placeholder="' + esc(f.placeholder || "例：1000000") + '">';
-        html += '<div class="money-preview" id="prev_' + f.name + '" style="font-size:13px;color:var(--gold-deep,#a9854a);font-weight:600;margin-top:4px;min-height:18px"></div>';
+        var mv = (v !== "" && v != null) ? Number(String(v).replace(/[^\d]/g, "") || 0).toLocaleString("ja-JP") : "";
+        html += '<input type="text" inputmode="numeric" class="money-input" name="' + f.name + '" id="f_' + f.name + '" value="' + mv + '" placeholder="' + esc(f.placeholder || "例：1,000,000") + '">';
       } else if (f.type === "textarea") {
         html += '<textarea name="' + f.name + '" id="f_' + f.name + '" placeholder="' + esc(f.placeholder || "") + '">' + esc(v) + '</textarea>';
       } else {
@@ -162,11 +161,20 @@
       '<button class="btn btn-primary" data-save>保存</button></div>';
     openModal(opts.title, body, function (m) {
       m.querySelectorAll(".money-input").forEach(function (inp) {
-        // 数字専用入力（確実に打てる）＋ すぐ下にコンマ付きで「＝ ¥1,000,000」表示
-        var prev = m.querySelector("#" + inp.getAttribute("data-prev"));
-        function upd() { if (prev) prev.textContent = inp.value ? "＝ ¥" + Number(inp.value).toLocaleString("ja-JP") : ""; }
-        inp.addEventListener("input", upd);
-        upd();
+        // 打ちながら欄の中にコンマを表示。カーソル位置はズレないように保つ。
+        inp.addEventListener("input", function () {
+          var start = inp.selectionStart;
+          var before = inp.value.slice(0, start).replace(/[^\d]/g, "").length;
+          var digits = inp.value.replace(/[^\d]/g, "");
+          inp.value = digits ? Number(digits).toLocaleString("ja-JP") : "";
+          var pos = 0, cnt = 0;
+          while (pos < inp.value.length && cnt < before) {
+            var ch = inp.value.charCodeAt(pos);
+            if (ch >= 48 && ch <= 57) cnt++;
+            pos++;
+          }
+          try { inp.setSelectionRange(pos, pos); } catch (e) {}
+        });
       });
       m.querySelector("[data-cancel]").onclick = closeModal;
       m.querySelector("[data-save]").onclick = function () {
