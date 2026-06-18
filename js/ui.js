@@ -121,8 +121,8 @@
         (f.options || []).forEach(function (o) { html += '<option value="' + esc(o) + '"></option>'; });
         html += '</datalist>';
       } else if (f.type === "money") {
-        var mv = (v !== "" && v != null) ? Number(String(v).replace(/[^\d]/g, "") || 0).toLocaleString("ja-JP") : "";
-        html += '<input type="text" inputmode="numeric" name="' + f.name + '" id="f_' + f.name + '" data-money="1" value="' + mv + '" placeholder="' + esc(f.placeholder || "例：1,000,000") + '">';
+        var mv = (v !== "" && v != null) ? Number(String(v).replace(/[^\d]/g, "") || 0) : "";
+        html += '<input type="number" inputmode="numeric" step="1" min="0" name="' + f.name + '" id="f_' + f.name + '" value="' + mv + '" placeholder="' + esc(f.placeholder || "例：1000000") + '">';
       } else if (f.type === "textarea") {
         html += '<textarea name="' + f.name + '" id="f_' + f.name + '" placeholder="' + esc(f.placeholder || "") + '">' + esc(v) + '</textarea>';
       } else {
