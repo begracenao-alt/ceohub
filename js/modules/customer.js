@@ -37,6 +37,7 @@
     { name: "consultDate", label: "相談／商談日", type: "date" },
     { name: "contractAmount", label: "契約金額", type: "number" },
     { name: "nextDate", label: "次回予定", type: "date" },
+    { name: "nextTime", label: "次回予定の時間", type: "time" },
     { name: "referrer", label: "紹介者", type: "text" },
     { name: "memo", label: "メモ", type: "textarea", full: true }
   ];
@@ -75,7 +76,7 @@
         '<td><span class="badge ' + badgeClass(r.status) + '">' + U.esc(r.status || "—") + '</span></td>' +
         '<td>' + U.esc(r.product) + '</td>' +
         '<td class="num">' + (r.contractAmount ? U.yen(r.contractAmount) : "—") + '</td>' +
-        '<td>' + U.fmtDate(r.nextDate) + '</td>' +
+        '<td>' + U.fmtDate(r.nextDate) + (r.nextTime ? " " + U.esc(r.nextTime) : "") + '</td>' +
         '<td>' + U.esc(r.referrer || "—") + '</td>' +
         '<td class="row-actions">' +
         '<button class="btn btn-sm" data-edit="' + r.id + '">編集</button>' +
