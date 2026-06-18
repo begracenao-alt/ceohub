@@ -332,3 +332,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .view { padding: 20px 16px 50px; }
   .topbar { padding: 14px 16px; }
 }
+
+/* 金額入力の上下矢印（スピナー）を消す＝数字は打てるまま、矢印だけ非表示 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
