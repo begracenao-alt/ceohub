@@ -369,7 +369,7 @@
   }
 
   function tableSales() {
-    var rows = S.list("sales");
+    var rows = S.list("sales").slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
     var body = rows.length ? rows.map(function (r) {
       return '<tr>' +
         '<td>' + U.fmtDate(r.date) + '</td>' +
@@ -387,7 +387,7 @@
   }
 
   function tableExp() {
-    var rows = S.list("expenses");
+    var rows = S.list("expenses").slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
     var body = rows.length ? rows.map(function (r) {
       return '<tr>' +
         '<td>' + U.fmtDate(r.date) + '</td>' +
