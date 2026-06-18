@@ -235,7 +235,7 @@
       '</div>';
   }
 
-  // 📅 近日の予定：予約・アポ＋発信の投稿予定日＋タスクの締切を集約（7日以内）
+  // 📅 近日の予定：予約・アポ＋発信の投稿予定日＋タスクの締切を集約（2週間以内）
   function dayDiff(a, b) { return Math.round((Date.parse(b) - Date.parse(a)) / 86400000); }
   function relBadge(d, today) {
     if (d < today) return '<span class="badge hot">' + dayDiff(d, today) + '日過ぎ</span>';
@@ -245,7 +245,7 @@
   }
   function upcomingHTML() {
     var today = U.todayStr();
-    var h = new Date(); h.setDate(h.getDate() + 7);
+    var h = new Date(); h.setDate(h.getDate() + 14);
     var hStr = h.getFullYear() + "-" + ("0" + (h.getMonth() + 1)).slice(-2) + "-" + ("0" + h.getDate()).slice(-2);
     var items = [];
     S.list("schedule").forEach(function (s) {
@@ -276,11 +276,12 @@
           '<span class="muted" style="font-size:12px">' + U.fmtDate(it.date) + '</span>' + relBadge(it.date, today) + '</span>' + del + '</div>';
       }).join("");
     } else {
-      inner = '<div class="hint">7日以内の予定はありません。<br>「＋ 予定」で予約・アポを、SNSで投稿予定、PROJECTで締切を入れると、ここに出ます。</div>';
+      inner = '<div class="hint">2週間以内の予定はありません。<br>「＋ 予定」で予約・アポを、SNSで投稿予定、PROJECTで締切を入れると、ここに出ます。</div>';
     }
     return '<div class="card mt" style="border-left:3px solid var(--rose)">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="card-title" style="margin:0">📅 近日の予定（7日以内）</div>' +
-      '<button class="btn btn-sm" id="addSched">＋ 予定</button></div>' + inner + '</div>';
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="card-title" style="margin:0">📅 近日の予定（2週間以内）</div>' +
+      '<button class="btn btn-sm" id="addSched">＋ 予定</button></div>' +
+      '<div style="max-height:48vh;overflow:auto">' + inner + '</div></div>';
   }
 
   function greetWord() {
