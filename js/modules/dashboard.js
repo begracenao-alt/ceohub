@@ -163,7 +163,7 @@
       box.innerHTML = arr.map(function (t, i) {
         return '<div class="todo-item' + (t.done ? ' done' : '') + '">' +
           '<input type="checkbox" data-i="' + i + '"' + (t.done ? ' checked' : '') + '>' +
-          '<input type="text" class="todo-text" data-i="' + i + '" value="' + U.esc(t.text) + '" placeholder="やることを書く…" style="border:none;background:transparent;flex:1;font-size:14px">' +
+          '<input type="text" class="todo-text" data-i="' + i + '" value="' + U.esc(t.text) + '" placeholder="ここに、やることを書く…" style="border:1px solid var(--line);background:var(--surface);border-radius:8px;flex:1;font-size:15px;padding:9px 11px">' +
           '<button class="btn btn-sm btn-ghost btn-danger" data-rm="' + i + '">×</button></div>';
       }).join("");
       box.querySelectorAll('input[type="checkbox"]').forEach(function (cb) {
@@ -176,6 +176,17 @@
         inp.onchange = function () {
           var i = +inp.getAttribute("data-i");
           arr[i].text = inp.value; S.saveTodos(U.todayStr(), arr);
+        };
+        // Enterキーで次の行を追加（続けて書きやすく）
+        inp.onkeydown = function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            var i = +inp.getAttribute("data-i");
+            arr[i].text = inp.value;
+            arr.push({ text: "", done: false });
+            S.saveTodos(U.todayStr(), arr);
+            renderTodos(true);
+          }
         };
       });
       box.querySelectorAll('[data-rm]').forEach(function (b) {
