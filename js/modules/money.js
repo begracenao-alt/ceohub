@@ -127,9 +127,9 @@
       '</div>';
 
     // 売上テーブル（画面内スクロール＝エンドレス防止）
-    html += '<div class="card mt">' + U.sectionHead("売上", "売上を追加", "addSale") + '<div style="max-height:46vh;overflow:auto">' + tableSales() + '</div>' + clearBtn("sales", "clrSale", "売上") + '</div>';
-    // 経費テーブル（画面内スクロール＝エンドレス防止）
-    html += '<div class="card">' + U.sectionHead("経費", "経費を追加", "addExp") + '<div style="max-height:46vh;overflow:auto">' + tableExp() + '</div>' + clearBtn("expenses", "clrExp", "経費") + '</div>';
+    html += '<div class="card mt">' + U.sectionHead("売上", "売上を追加", "addSale") + tableSales() + clearBtn("sales", "clrSale", "売上") + '</div>';
+    // 経費テーブル
+    html += '<div class="card">' + U.sectionHead("経費", "経費を追加", "addExp") + tableExp() + clearBtn("expenses", "clrExp", "経費") + '</div>';
     // 勘定科目の早見表（下に）
     html += hayamiHTML();
     // データを取り込む（コピー＆貼り付け）※いちばん下に

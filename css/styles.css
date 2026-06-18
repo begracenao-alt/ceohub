@@ -212,7 +212,7 @@ body {
 .section-head h2 { font-family: var(--serif); font-size: 18px; font-weight: 600; }
 
 /* テーブル */
-.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
+.table-wrap { overflow-x: auto; overflow-y: auto; max-height: 52vh; border-radius: var(--radius-sm); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th, td { text-align: left; padding: 11px 13px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
 th { color: var(--muted); font-weight: 600; font-size: 11.5px; letter-spacing: 0.03em; }
