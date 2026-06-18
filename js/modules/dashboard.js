@@ -248,6 +248,11 @@
       if (t.status === "完了" || !t.due) return;
       if (t.due <= hStr) items.push({ date: t.due, icon: "✅", label: (t.task || t.project || "(無題)"), go: "project" });
     });
+    S.list("customers").forEach(function (c) {
+      if (c.nextDate && c.nextDate >= today && c.nextDate <= hStr) {
+        items.push({ date: c.nextDate, icon: "🤝", label: (c.name || "(お客様)") + (c.nextTime ? " " + c.nextTime : "") + "・次回予定", go: "customer" });
+      }
+    });
     items.sort(function (a, b) { return (a.date || "").localeCompare(b.date || ""); });
     var inner;
     if (items.length) {
