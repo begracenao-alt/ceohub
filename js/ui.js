@@ -161,7 +161,11 @@
       '<button class="btn btn-primary" data-save>保存</button></div>';
     openModal(opts.title, body, function (m) {
       m.querySelectorAll("[data-money]").forEach(function (inp) {
-        inp.addEventListener("input", function () {
+        // 打っている間は数字そのまま（邪魔しない）。指を離したらカンマ表示。
+        inp.addEventListener("focus", function () {
+          inp.value = inp.value.replace(/[^\d]/g, "");
+        });
+        inp.addEventListener("blur", function () {
           var digits = inp.value.replace(/[^\d]/g, "");
           inp.value = digits ? Number(digits).toLocaleString("ja-JP") : "";
         });
