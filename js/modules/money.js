@@ -44,7 +44,7 @@
     { name: "product", label: "商品／サービス名", type: "text" },
     { name: "amount", label: "売上金額", type: "money" },
     { name: "dueDate", label: "入金予定日", type: "date" },
-    { name: "payMethod", label: "支払い方法", type: "select", options: ["銀行振込", "クレジット", "現金", "PayPay", "その他"] },
+    { name: "payMethod", label: "支払い方法", type: "select", options: ["銀行振込", "クレジット", "現金", "PayPay", "PayPal", "その他"] },
     { name: "paid", label: "入金済み", type: "checkbox" },
     { name: "memo", label: "メモ", type: "textarea", full: true }
   ];
