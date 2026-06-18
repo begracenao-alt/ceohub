@@ -255,6 +255,10 @@
       if (c.posted || !c.scheduledDate) return;
       if (c.scheduledDate <= hStr) { var md = (c.media && c.media.length) ? c.media.join("・") : c.category; items.push({ date: c.scheduledDate, icon: "📣", label: (c.title || "(無題)") + (md ? "・" + md : ""), go: "sns" }); }
     });
+    S.list("contents").forEach(function (c) {
+      if (c.shot || !c.shootDate) return;
+      if (c.shootDate >= today && c.shootDate <= hStr) items.push({ date: c.shootDate, icon: "🎬", label: (c.title || "(無題)") + "・撮影", go: "sns" });
+    });
     S.list("projects").forEach(function (t) {
       if (t.status === "完了" || !t.due) return;
       if (t.due <= hStr) items.push({ date: t.due, icon: "✅", label: (t.task || t.project || "(無題)"), go: "project" });

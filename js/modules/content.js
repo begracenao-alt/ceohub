@@ -40,6 +40,7 @@
     { name: "media", label: "媒体（複数えらべます）", type: "checks", options: CATS, full: true },
     { name: "mediaNew", label: "新しい媒体を追加（任意・ここに打つと媒体に増えます）", type: "text", placeholder: "例：TikTok・Podcast など", full: true },
     { name: "purpose", label: "投稿の目的", type: "select", options: ["価値を届ける", "認知を広げる", "信頼・人柄を伝える", "案内・オファー"] },
+    { name: "shootDate", label: "撮影日", type: "date" },
     { name: "scheduledDate", label: "投稿予定日", type: "date" },
     { name: "idea", label: "アイデア／内容", type: "textarea", full: true },
     { name: "script", label: "台本（スクリプト）", type: "textarea", full: true, placeholder: "台本アプリで作った台本を、ここに貼り付けておけます" },
@@ -129,6 +130,7 @@
       return '<tr>' +
         '<td>' + U.esc(r.title) + (r.script ? ' 📝' : '') + (r.purpose ? ' <span class="badge gray" style="font-weight:600">' + U.esc(r.purpose) + '</span>' : '') + '</td>' +
         '<td>' + mediaCell + '</td>' +
+        '<td>' + U.fmtDate(r.shootDate) + '</td>' +
         '<td>' + U.fmtDate(r.scheduledDate) + '</td>' +
         '<td style="text-align:center">' + chk(r.shot) + '</td>' +
         '<td style="text-align:center">' + chk(r.edited) + '</td>' +
@@ -138,9 +140,9 @@
         '<button class="btn btn-sm" data-edit="' + r.id + '">編集</button>' +
         '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button></td>' +
         '</tr>';
-    }).join("") : U.emptyRow(8, "発信アイデアを追加してみましょう");
+    }).join("") : U.emptyRow(9, "発信アイデアを追加してみましょう");
     html += '<div class="table-wrap"><table><thead><tr>' +
-      '<th>タイトル</th><th>媒体</th><th>予定日</th><th>撮影</th><th>編集</th><th>投稿</th><th>反応</th><th></th>' +
+      '<th>タイトル</th><th>媒体</th><th>撮影日</th><th>予定日</th><th>撮影</th><th>編集</th><th>投稿</th><th>反応</th><th></th>' +
       '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
 
     view.innerHTML = html;
