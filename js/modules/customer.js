@@ -83,9 +83,9 @@
         '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button></td>' +
         '</tr>';
     }).join("") : U.emptyRow(7, "最初のお客様を追加してみましょう");
-    html += '<div class="table-wrap"><table><thead><tr>' +
+    html += '<div style="max-height:46vh;overflow:auto"><div class="table-wrap"><table><thead><tr>' +
       '<th>名前</th><th>ステータス</th><th>商品</th><th class="num">契約金額</th><th>次回予定</th><th>紹介者</th><th></th>' +
-      '</tr></thead><tbody>' + body + '</tbody></table></div></div>';
+      '</tr></thead><tbody>' + body + '</tbody></table></div></div></div>';
 
     view.innerHTML = html;
     document.getElementById("addC").onclick = function () {
