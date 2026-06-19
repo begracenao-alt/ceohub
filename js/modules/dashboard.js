@@ -177,17 +177,6 @@
           var i = +inp.getAttribute("data-i");
           arr[i].text = inp.value; S.saveTodos(U.todayStr(), arr);
         };
-        // Enterキーで次の行を追加（続けて書きやすく）
-        inp.onkeydown = function (e) {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            var i = +inp.getAttribute("data-i");
-            arr[i].text = inp.value;
-            arr.push({ text: "", done: false });
-            S.saveTodos(U.todayStr(), arr);
-            renderTodos(true);
-          }
-        };
       });
       box.querySelectorAll('[data-rm]').forEach(function (b) {
         b.onclick = function () {
