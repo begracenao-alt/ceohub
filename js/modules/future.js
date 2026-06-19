@@ -5,6 +5,21 @@
 
   function render(view) {
     var f = S.future();
+
+    // 月が変わったら、先月の「今月の設定」を自動で記録に保存し、今月分を新しく始める
+    var ym = U.curYM();
+    f.monthly = f.monthly || {};
+    f.months = f.months || {};
+    if (!f.monthMark) f.monthMark = ym;
+    if (f.monthMark !== ym) {
+      var prev = f.monthly;
+      if (prev && (prev.theme || prev.salesGoal || prev.idealState || prev.todo || prev.stop)) {
+        f.months[f.monthMark] = prev;
+      }
+      f.monthly = {};
+      f.monthMark = ym;
+      S.saveFuture(f);
+    }
     var m = BG.calc.money ? BG.calc.money() : { mSales: 0, ySales: 0 };
     var cust = BG.calc.customer ? BG.calc.customer() : { contract: 0 };
     var price = U.num(S.settings().price);
@@ -56,6 +71,29 @@
       kv("雇用したい人数", f.yearly.hireCount) +
       kv("社会に広げたい価値", f.yearly.socialValue) +
       '</div>';
+
+    // これまでの月（ふりかえり）— 月ごとに積み上がる記録
+    var pastKeys = Object.keys(f.months).filter(function (k) {
+      var p = f.months[k];
+      return p && (p.theme || p.salesGoal || p.idealState || p.todo || p.stop);
+    }).sort().reverse();
+    if (pastKeys.length) {
+      html += '<div class="card"><div class="card-title">これまでの月（ふりかえり）</div>' +
+        '<p class="hint" style="margin-bottom:6px">毎月のテーマや目標が、ここに積み上がります。あとから成長を振り返れます。</p>' +
+        '<div style="max-height:52vh;overflow:auto">';
+      pastKeys.forEach(function (k) {
+        var pm = f.months[k];
+        var label = k.slice(0, 4) + '年' + (+k.slice(5, 7)) + '月';
+        html += '<div style="border-top:1px solid var(--line-2);padding:12px 0">' +
+          '<div style="font-weight:600;margin-bottom:6px">' + label + (pm.theme ? '：' + U.esc(pm.theme) : '') + '</div>' +
+          (pm.salesGoal ? kv("売上目標", U.yen(pm.salesGoal)) : '') +
+          (pm.idealState ? kv("理想の状態", pm.idealState) : '') +
+          (pm.todo ? kv("やりたいこと", pm.todo) : '') +
+          (pm.stop ? kv("やめること", pm.stop) : '') +
+          '</div>';
+      });
+      html += '</div></div>';
+    }
 
     view.innerHTML = html;
 
