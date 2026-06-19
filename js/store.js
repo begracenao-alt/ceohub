@@ -42,6 +42,7 @@
       weekly: [],      // 週次ミーティング
       todos: {},       // 今日やること { "YYYY-MM-DD": [{text, done}] }
       diagnosis: [],   // 「今日の戦略」のログ
+      links: [],       // リンク集（貼って・コピーできる） [{id, name, url}]
       sync: { enabled: false, url: "", lastSync: "" }
     };
   }

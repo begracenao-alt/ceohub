@@ -16,6 +16,7 @@
     { key: "customer", label: "Customer", ico: "👥" },
     { key: "project", label: "Project", ico: "📋" },
     { key: "sns", label: "SNS", ico: "📱" },
+    { key: "links", label: "Links", ico: "🔗" },
     { sep: "Self & Team" },
     { key: "body", label: "Body", ico: "🌿" },
     { key: "team", label: "Team", ico: "🤝" },
