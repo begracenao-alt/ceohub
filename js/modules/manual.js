@@ -40,14 +40,14 @@
       '</div>';
 
     html += '<div class="section-head mt"><h2>マニュアル</h2><button class="btn btn-primary" id="addMa">+ マニュアルを追加</button></div>';
-    var rows = S.list("manuals");
+    var rows = S.list("manuals").slice().sort(function (a, b) { return (b.pin ? 1 : 0) - (a.pin ? 1 : 0); });
     if (!rows.length) {
       html += '<div class="card"><p class="empty">まだマニュアルがありません。<br>毎日やっている業務をひとつ書き出すことから始めましょう。</p></div>';
     } else {
       html += '<div style="max-height:62vh;overflow:auto"><div class="grid grid-2">';
       rows.forEach(function (r) {
         html += '<div class="card">' +
-          '<div class="section-head"><h2 style="font-size:16px">' + U.esc(r.name) + '</h2>' +
+          '<div class="section-head"><h2 style="font-size:16px">' + (r.pin ? '📌 ' : '') + U.esc(r.name) + '</h2>' +
           '<span class="badge gray">' + U.esc(r.category) + '</span></div>' +
           (r.steps ? '<div style="white-space:pre-wrap;font-size:13px;margin-bottom:8px">' + U.esc(r.steps) + '</div>' : '') +
           line("担当", r.assignee) + line("ツール", r.tools) + line("注意点", r.notes) +
@@ -55,6 +55,7 @@
           (r.videoLink ? '<div style="margin-bottom:6px"><a href="' + U.esc(r.videoLink) + '" target="_blank">動画リンク</a></div>' : '') +
           '<div class="muted" style="font-size:11px">更新日：' + U.esc(r.updated || "—") + '</div>' +
           '<div class="row-actions mt">' +
+          '<button class="btn btn-sm" data-pin="' + r.id + '">' + (r.pin ? '📌 固定中' : '📌 上に固定') + '</button>' +
           '<button class="btn btn-sm" data-edit="' + r.id + '">編集</button>' +
           '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button></div>' +
           '</div>';
@@ -67,6 +68,16 @@
       U.recordModal({ title: "マニュアルを追加", fields: fields, values: { category: "顧客対応", assignee: "自分", updated: U.todayStr() },
         onSave: function (v) { S.add("manuals", v); U.toast("追加しました"); render(view); } });
     };
+    view.querySelectorAll("[data-pin]").forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute("data-pin");
+        var rec = S.find("manuals", id);
+        var np = !(rec && rec.pin);
+        S.update("manuals", id, { pin: np });
+        U.toast(np ? "上に固定しました" : "固定を外しました");
+        render(view);
+      };
+    });
     view.querySelectorAll("[data-edit]").forEach(function (b) {
       b.onclick = function () {
         var id = b.getAttribute("data-edit");
