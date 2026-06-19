@@ -41,7 +41,7 @@
     if (!rows.length) {
       html += '<div class="card"><p class="empty">まだ登録がありません。<br>「今後こんな人に、こんな仕事を任せたい」という未来メモから始めてみましょう。</p></div>';
     } else {
-      html += '<div class="grid grid-2">';
+      html += '<div style="max-height:62vh;overflow:auto"><div class="grid grid-2">';
       rows.forEach(function (r) {
         html += '<div class="card">' +
           '<div class="section-head"><h2 style="font-size:16px">' + U.esc(r.name || "（名前未設定）") + '</h2>' +
@@ -58,7 +58,7 @@
           '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button></div>' +
           '</div>';
       });
-      html += '</div>';
+      html += '</div></div>';
     }
 
     view.innerHTML = html;

@@ -27,6 +27,7 @@
     if (!rows.length) {
       html += '<div class="card"><p class="empty">まだ振り返りがありません。<br>週の終わりに、5分だけ自分とミーティングしてみましょう。</p></div>';
     } else {
+      html += '<div style="max-height:62vh;overflow:auto">';
       rows.forEach(function (r) {
         html += '<div class="card">' +
           '<div class="section-head"><h2 style="font-size:16px">' + U.esc(r.weekOf) + ' の週</h2>' +
@@ -39,6 +40,7 @@
           line("来週やること", r.nextTop) + line("手放すこと", r.letGo) + line("任せたいこと", r.delegate) +
           '</div>';
       });
+      html += '</div>';
     }
 
     view.innerHTML = html;

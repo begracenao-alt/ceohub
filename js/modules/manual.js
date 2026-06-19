@@ -44,7 +44,7 @@
     if (!rows.length) {
       html += '<div class="card"><p class="empty">まだマニュアルがありません。<br>毎日やっている業務をひとつ書き出すことから始めましょう。</p></div>';
     } else {
-      html += '<div class="grid grid-2">';
+      html += '<div style="max-height:62vh;overflow:auto"><div class="grid grid-2">';
       rows.forEach(function (r) {
         html += '<div class="card">' +
           '<div class="section-head"><h2 style="font-size:16px">' + U.esc(r.name) + '</h2>' +
@@ -59,7 +59,7 @@
           '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button></div>' +
           '</div>';
       });
-      html += '</div>';
+      html += '</div></div>';
     }
 
     view.innerHTML = html;
