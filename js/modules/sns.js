@@ -12,7 +12,7 @@
   /* 住所をかしこく整える：前後の空白や、URLでない文字を取り除き、https:// を補う */
   function normUrl(u) {
     u = (u || "").trim();
-    var m = u.match(/https?:\/\/[^\s)"'<>]+/i); // 文中にURLがあれば、その部分だけ取り出す
+    var m = u.match(/https?:\/\/[^\s\]\[()<>"']+/i); // 文中のURL部分だけを取り出す（[ ] ( ) などの記号で囲まれていてもOK）
     if (m) return m[0];
     if (!u) return "#";
     return "https://" + u.replace(/^[\s/]+/, ""); // https:// が無ければ補う
