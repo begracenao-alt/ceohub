@@ -18,6 +18,23 @@
     return "https://" + u.replace(/^[\s/]+/, ""); // https:// が無ければ補う
   }
 
+  function copyText(text) {
+    function done() { U.toast("コピーしました ✓"); }
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy"); done(); } catch (e2) { U.toast("コピーできませんでした"); }
+      document.body.removeChild(ta);
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  }
+
   /* 🔗 マイSNS：自分のSNSをすぐ開いて数字を確認する場所 */
   function renderMyLinks(view) {
     var rows = S.list("snsLinks");
@@ -33,6 +50,7 @@
           '<div style="word-break:break-all;font-size:13px;background:#f4f7fb;border-radius:8px;padding:8px 10px;margin-bottom:10px">' + U.esc(r.url || "") + '</div>' +
           '<div class="row-actions">' +
           '<a class="btn btn-sm btn-primary" href="' + U.esc(normUrl(r.url)) + '" target="_blank" rel="noopener">開く（数字を見る）</a>' +
+          '<button class="btn btn-sm" data-copy="' + r.id + '">📋 コピー</button>' +
           '<button class="btn btn-sm" data-edit="' + r.id + '">編集</button>' +
           '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button>' +
           '</div></div>';
@@ -45,6 +63,12 @@
       U.recordModal({ title: "SNSを追加", fields: snsFields, values: {},
         onSave: function (v) { S.add("snsLinks", v); U.toast("追加しました"); renderMyLinks(view); } });
     };
+    view.querySelectorAll("[data-copy]").forEach(function (b) {
+      b.onclick = function () {
+        var r = S.find("snsLinks", b.getAttribute("data-copy"));
+        if (r) copyText(normUrl(r.url));
+      };
+    });
     view.querySelectorAll("[data-edit]").forEach(function (b) {
       b.onclick = function () {
         var id = b.getAttribute("data-edit");
