@@ -9,6 +9,15 @@
     { name: "url", label: "リンク（URL）", type: "text", full: true, placeholder: "例：https://www.instagram.com/＿＿＿/" }
   ];
 
+  /* 住所をかしこく整える：前後の空白や、URLでない文字を取り除き、https:// を補う */
+  function normUrl(u) {
+    u = (u || "").trim();
+    var m = u.match(/https?:\/\/[^\s)"'<>]+/i); // 文中にURLがあれば、その部分だけ取り出す
+    if (m) return m[0];
+    if (!u) return "#";
+    return "https://" + u.replace(/^[\s/]+/, ""); // https:// が無ければ補う
+  }
+
   /* 🔗 マイSNS：自分のSNSをすぐ開いて数字を確認する場所 */
   function renderMyLinks(view) {
     var rows = S.list("snsLinks");
@@ -23,7 +32,7 @@
           '<div class="section-head"><h2 style="font-size:16px">🔗 ' + U.esc(r.name || "（名前なし）") + '</h2></div>' +
           '<div style="word-break:break-all;font-size:13px;background:#f4f7fb;border-radius:8px;padding:8px 10px;margin-bottom:10px">' + U.esc(r.url || "") + '</div>' +
           '<div class="row-actions">' +
-          '<a class="btn btn-sm btn-primary" href="' + U.esc(r.url || "#") + '" target="_blank" rel="noopener">開く（数字を見る）</a>' +
+          '<a class="btn btn-sm btn-primary" href="' + U.esc(normUrl(r.url)) + '" target="_blank" rel="noopener">開く（数字を見る）</a>' +
           '<button class="btn btn-sm" data-edit="' + r.id + '">編集</button>' +
           '<button class="btn btn-sm btn-danger" data-del="' + r.id + '">削除</button>' +
           '</div></div>';
