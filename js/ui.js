@@ -183,7 +183,9 @@
     openModal(opts.title, body, function (m) {
       m.querySelectorAll(".money-input").forEach(function (inp) {
         // 打ちながら欄の中にコンマを表示。カーソル位置はズレないように保つ。
-        inp.addEventListener("input", function () {
+        // 日本語入力（IME）の変換中は処理を止めて、確定したあとに整える。
+        var composing = false;
+        function reformat() {
           var start = inp.selectionStart;
           var before = inp.value.slice(0, start).replace(/[^\d]/g, "").length;
           var digits = inp.value.replace(/[^\d]/g, "");
@@ -195,7 +197,10 @@
             pos++;
           }
           try { inp.setSelectionRange(pos, pos); } catch (e) {}
-        });
+        }
+        inp.addEventListener("compositionstart", function () { composing = true; });
+        inp.addEventListener("compositionend", function () { composing = false; reformat(); });
+        inp.addEventListener("input", function () { if (composing) return; reformat(); });
       });
       m.querySelector("[data-cancel]").onclick = closeModal;
       m.querySelector("[data-save]").onclick = function () {
